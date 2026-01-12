@@ -1,0 +1,32 @@
+# DEPRECATED: moved to application-localh2.yaml
+server.port=8081
+
+# Example JWT/OIDC configuration ? replace with your IdP's issuer/jwks
+spring.security.oauth2.resourceserver.jwt.issuer-uri=https://idp.example.com/
+# Alternatively (if issuer discovery isn't used), set jwk set uri directly:
+# spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://idp.example.com/.well-known/jwks.json
+
+# H2 and JPA settings for development
+spring.datasource.url=jdbc:h2:mem:loketdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create-drop
+spring.jpa.show-sql=true
+
+# Enable H2 console
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# Show security-related warnings (Unauthorized / AccessDenied) in logs during dev
+logging.level.org.loket.authN.security=DEBUG
+logging.level.org.springframework.security=INFO
+
+# Include MDC entries in console pattern: requestId and remoteIp
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId:-},%X{remoteIp:-}] %msg%n
+
+# Uncomment and configure if you want oauth2 client (browser login)
+# spring.security.oauth2.client.registration.myidp.client-id=your-client-id
+# spring.security.oauth2.client.registration.myidp.client-secret=your-client-secret
+# spring.security.oauth2.client.registration.myidp.scope=openid,profile,email
+# spring.security.oauth2.client.provider.myidp.issuer-uri=https://idp.example.com/
