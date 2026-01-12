@@ -1,0 +1,54 @@
+{{- /*
+Notes template for loket-authn Helm chart
+This file will be shown to the user after a successful `helm install`/`helm upgrade`.
+*/ -}}
+
+Thank you for installing {{ include "loket-authn.fullname" . }}.
+
+Access instructions
+-------------------
+
+1) Port-forward (quick local access)
+
+   If your Service is ClusterIP (default), run this to forward the service port to your laptop:
+
+   kubectl port-forward svc/{{ include "loket-authn.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+   Example (in another terminal):
+
+   curl http://localhost:{{ .Values.service.port }}/hello
+
+2) Service URL (if a LoadBalancer or NodePort is used)
+
+   # For LoadBalancer (may take a minute to get an external IP):
+   kubectl get svc {{ include "loket-authn.fullname" . }} -n {{ .Release.Namespace }}
+
+   # For NodePort, find the node port
+   kubectl get svc {{ include "loket-authn.fullname" . }} -n {{ .Release.Namespace }} -o yaml | grep nodePort -A2 || true
+
+3) Get logs (for debugging)
+
+   kubectl logs deployment/{{ include "loket-authn.fullname" . }} -n {{ .Release.Namespace }}
+
+   To stream logs:
+   kubectl logs deployment/{{ include "loket-authn.fullname" . }} -n {{ .Release.Namespace }} -f
+
+4) Retrieve the JWT secret stored in the generated Kubernetes Secret
+
+   kubectl get secret {{ include "loket-authn.fullname" . }}-secrets -n {{ .Release.Namespace }} -o go-template='{{"{{"}} index .data "SECURITY_JWT_SECRET" | base64decode {{"}}"}}'
+
+   (If you prefer a one-liner that prints with a label):
+   echo "JWT secret: $(kubectl get secret {{ include "loket-authn.fullname" . }}-secrets -n {{ .Release.Namespace }} -o go-template='{{"{{"}} index .data "SECURITY_JWT_SECRET" | base64decode {{"}}"}}')"
+
+5) Uninstall
+
+   helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+Notes
+-----
+- The chart sets SPRING_PROFILES_ACTIVE to the value of `env.spring_profiles_active` (default: `localh2`).
+- If you used `--set oracle.enabled=true`, the deployment will have JDBC env vars configured for Oracle.
+- For production, consider external secret stores (Vault, ExternalSecrets) instead of chart values.
+
+Happy testing!
+

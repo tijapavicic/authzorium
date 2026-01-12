@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authzorium
+  namespace: loket
+spec:
+  template:
+    spec:
+      containers:
+        - name: authzorium
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "localh2"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:h2:mem:loketdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "sa"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: ""
+          # Very small resource footprint for constrained dev environments
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "150m"
+              memory: "128Mi"
+          # Remove probes to avoid startup failures in constrained environments
+          readinessProbe: {}
+          livenessProbe: {}
+

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authzorium
+  namespace: loket
+spec:
+  template:
+    spec:
+      containers:
+        - name: authzorium
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "localh2"
+            # Remove any explicit SPRING_DATASOURCE_URL/USERNAME/PASSWORD that point to Oracle
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:h2:mem:loketdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "sa"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: ""
+              valueFrom: null
+          # Smaller resource footprint for quick local development
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"

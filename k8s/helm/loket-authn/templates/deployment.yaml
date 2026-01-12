@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "loket-authn.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "loket-authn.name" . }}
+    helm.sh/chart: {{ include "loket-authn.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "loket-authn.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "loket-authn.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ include "loket-authn.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: http
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "{{ .Values.env.spring_profiles_active }}"
+            - name: SECURITY_JWT_SECRET
+              value: "{{ .Values.env.security_jwt_secret }}"
+            - name: SPRING_DATASOURCE_URL
+              value: "{{ if .Values.oracle.enabled }}jdbc:oracle:thin:@{{ .Values.oracle.host }}:{{ .Values.oracle.port }}:XE{{ end }}"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "{{ if .Values.oracle.enabled }}{{ .Values.oracle.username }}{{ end }}"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "{{ if .Values.oracle.enabled }}{{ .Values.oracle.password }}{{ end }}"
+{{- if and .Values.config.enable .Values.config.useConfigFile }}
+            - name: SPRING_CONFIG_LOCATION
+              value: "/config/{{ .Values.config.configFileName }}"
+{{- end }}
+{{- if and .Values.config.enable .Values.config.useConfigFile }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+{{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probe.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probe.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probe.periodSeconds }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "loket-authn.fullname" . }}-config

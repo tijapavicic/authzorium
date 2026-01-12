@@ -1,0 +1,97 @@
+{
+  "info": {
+    "name": "Locket AuthN - Local",
+    "_postman_id": "d6b3b3f6-0000-4000-8000-000000000000",
+    "description": "Simple Postman collection to test the Locket AuthN service (local). Includes /hello requests with and without Authorization header.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "<PUT_YOUR_JWT_HERE>",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Hello (no auth)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/hello",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hello"
+          ]
+        },
+        "description": "GET /hello without Authorization header (should be publicly accessible in dev setup)."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 2xx', function () {",
+              "    pm.expect(pm.response.code).to.be.within(200, 299);",
+              "});",
+              "pm.test('Body contains Hello', function () {",
+              "    pm.expect(pm.response.text()).to.include('Hello');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hello (with Bearer JWT)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/hello",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "hello"
+          ]
+        },
+        "description": "GET /hello with Authorization header. Useful to test protected endpoints when you enable auth. Replace collection variable 'jwt_token' with a valid token."
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 2xx', function () {",
+              "    pm.expect(pm.response.code).to.be.within(200, 299);",
+              "});",
+              "pm.test('Body contains Hello', function () {",
+              "    pm.expect(pm.response.text()).to.include('Hello');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oracle-db
+  namespace: loket
+  labels:
+    app: oracle-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle-db
+  template:
+    metadata:
+      labels:
+        app: oracle-db
+    spec:
+      containers:
+        - name: oracle-db
+          image: gvenzl/oracle-xe:18.4.0
+          env:
+            - name: ORACLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-secret
+                  key: password
+            - name: ORACLE_ALLOW_REMOTE
+              value: "true"
+          ports:
+            - containerPort: 1521
+            - containerPort: 8082
+          volumeMounts:
+            - name: oracle-data
+              mountPath: /opt/oracle/oradata
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  echo "SELECT 1 FROM DUAL;" | sqlplus -s system/$ORACLE_PASSWORD@//localhost:1521/XE >/dev/null 2>&1 || exit 1
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: oracle-data
+          persistentVolumeClaim:
+            claimName: oracle-pvc
+

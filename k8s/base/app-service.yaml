@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: authzorium
+  namespace: loket
+  labels:
+    app: authzorium
+spec:
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082
+  selector:
+    app: authzorium
+  type: ClusterIP
+

@@ -1,0 +1,27 @@
+replicaCount: 1
+
+image:
+  repository: authzorium
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+env:
+  spring_profiles_active: "localh2"
+  security_jwt_secret: "dev-changeit-changeit-changeit"
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+config:
+  enable: true
+  useConfigFile: true
+  configFileName: application-localh2.yaml
+
+oracle:
+  enabled: false
+
