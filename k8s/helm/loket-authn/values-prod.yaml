@@ -1,0 +1,30 @@
+replicaCount: 3
+
+image:
+  repository: authzorium
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+env:
+  spring_profiles_active: "prod"
+  security_jwt_secret: "REPLACE_WITH_SECRET_IN_SECRETS_MANAGER"
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
+
+config:
+  enable: false
+  useConfigFile: false
+
+oracle:
+  enabled: true
+  host: "oracle.prod.svc.cluster.local"
+  port: 1521
+  username: "prod_user"
+  password: "prod_password_placeholder"
+

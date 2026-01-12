@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authzorium
+  namespace: loket
+  labels:
+    app: authzorium
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authzorium
+  template:
+    metadata:
+      labels:
+        app: authzorium
+    spec:
+      containers:
+        - name: authzorium
+          image: authzorium:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8082
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "oracle"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:oracle:thin:@oracle-db:1521:XE"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "system"
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-secret
+                  key: password
+            - name: SERVER_PORT
+              value: "8082"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 30
+            periodSeconds: 30

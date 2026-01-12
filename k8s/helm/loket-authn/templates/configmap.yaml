@@ -1,0 +1,13 @@
+{{- if .Values.config.enable -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "loket-authn.fullname" . }}-config
+  labels:
+    app.kubernetes.io/name: {{ include "loket-authn.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+data:
+  {{ .Values.config.configFileName }}: |-
+{{ .Files.Get .Values.config.configFileName | indent 4 }}
+{{- end }}
+

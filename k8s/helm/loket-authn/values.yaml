@@ -1,0 +1,52 @@
+replicaCount: 1
+
+image:
+  repository: authzorium
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  hosts:
+    - host: loket.local
+      paths:
+        - /
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+env:
+  spring_profiles_active: "localh2"
+  security_jwt_secret: "changeit-changeit-changeit-changeit"
+
+# Optional: enable oracle (true -> configure external oracle connection)
+oracle:
+  enabled: false
+  host: "oracle.local"
+  port: 1521
+  username: "system"
+  password: "loket_pwd"
+
+# Liveness/readiness probe settings
+probe:
+  enabled: true
+  path: /actuator/health
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+# Config file mounting: when enabled, chart will create a ConfigMap from files/application-localh2.yaml
+config:
+  enable: true
+  useConfigFile: true
+  configFileName: application-localh2.yaml
+
+# RBAC, serviceAccount, nodeSelector, tolerations left as defaults
