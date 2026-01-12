@@ -1,4 +1,4 @@
-package org.authzorium;
+package org.authzorium.client;
 
 
 import org.springframework.boot.SpringApplication;
@@ -22,3 +22,4 @@ public class AuthZoriumApplication {
         log.info("Active profiles: {} | server.port={}", activeProfiles, port);
     }
 }
+

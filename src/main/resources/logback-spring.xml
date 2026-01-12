@@ -1,0 +1,52 @@
+<configuration scan="true">
+
+  <property name="LOG_HOME" value="${LOG_HOME:-./logs}" />
+
+  <!-- Console appender (keeps existing Spring Boot console behavior) -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId:-},%X{remoteIp:-}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Rolling file appender dedicated to request flow traces (filtered by FLOW marker via custom filter) -->
+  <appender name="REQUEST_FLOW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/request-flow.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover and keep 30 days -->
+      <fileNamePattern>${LOG_HOME}/request-flow.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId:-},%X{remoteIp:-}] %msg%n</pattern>
+    </encoder>
+    <!-- Accept only events marked with Marker 'FLOW' via custom class -->
+    <filter class="org.authzorium.client.logging.FlowMarkerFilter" />
+  </appender>
+
+  <!-- Optional file appender for full application logs (not required but useful) -->
+  <appender name="APP_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_HOME}/application.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_HOME}/application.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>20MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{requestId:-},%X{remoteIp:-}] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="APP_FILE" />
+    <appender-ref ref="REQUEST_FLOW" />
+  </root>
+
+</configuration>
+
