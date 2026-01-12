@@ -1,0 +1,123 @@
+version: '3.8'
+
+# NOTE: On Apple Silicon (arm64) many modern images provide arm64 manifests and will run natively.
+# To prefer native arm images and avoid QEMU emulation, do NOT set DOCKER_DEFAULT_PLATFORM.
+# If you must run an amd64-only service (e.g. Oracle), run the compose command with DOCKER_DEFAULT_PLATFORM=linux/amd64
+# for that run only: DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:18.4.0
+    # Leave platform unset so Docker will pull/run the native platform when available (no emulation by default).
+    # To force amd64 emulation for Oracle only, run:
+    # DOCKER_DEFAULT_PLATFORM=linux/amd64 docker compose up oracle-db
+    container_name: loket-oracle-xe
+    environment:
+      - ORACLE_PASSWORD=loket_pwd
+      - ORACLE_ALLOW_REMOTE=true
+    ports:
+      - "1521:1521"
+      - "8082:8082" # optional Enterprise Manager console
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL;' | sqlplus -s system/$ORACLE_PASSWORD@//localhost:1521/XE >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+  app:
+    build: .
+    image: authzorium:latest
+    container_name: authzorium
+    # Map host 8081 to the container's actual Tomcat port 8080 (Spring Boot default)
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=oracle
+    depends_on:
+      oracle-db:
+        condition: service_healthy
+
+ # Keycloak: runs bahbac/keykloak image. By default this compose uses Postgres for persistence.
+  # If you want a quick dev-only server you can override KC_DB=dev-mem or use the `start-dev` command.
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: loket-keycloak
+    ports:
+      - "8087:8087"
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_DB_URL_HOST=keycloak-db
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Postgres for Keycloak persistence
+  keycloak-db:
+    image: postgres:14
+    container_name: loket-keycloak-db
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - keycloak-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak -h localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # SonarQube (optional) - runs the Community SonarQube server and a Postgres DB for it.
+  # Exposed on host port 8889 -> container port 9000 so it doesn't conflict with other services.
+  # Start it with: docker compose up sonarqube sonarqube-db
+  # Access SonarQube at: http://localhost:8889
+  # Default login: admin / admin
+  # avoid hardt termination by setting a long stop-timeout:
+  # docker run --stop-timeout 3600 sonarqube
+  sonarqube-db:
+    image: postgres:14
+    container_name: loket-sonarqube-db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - sonarqube-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar -d sonar -h localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  sonarqube:
+    image: sonarqube:latest
+    container_name: loket-sonarqube
+    depends_on:
+      sonarqube-db:
+        condition: service_healthy
+    ports:
+      - "8889:9000" # host:container
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    volumes:
+      - sonarqube-data:/opt/sonarqube/data
+      - sonarqube-logs:/opt/sonarqube/logs
+      - sonarqube-extensions:/opt/sonarqube/extensions
+    restart: unless-stopped
+
+volumes:
+  oracle-data:
+  keycloak-pgdata:
+  sonarqube-pgdata:
+  sonarqube-data:
+  sonarqube-logs:
+  sonarqube-extensions:

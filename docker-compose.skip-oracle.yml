@@ -1,0 +1,21 @@
+version: '3.8'
+
+# Override to run the app without Oracle (use H2 in-memory for fast local dev).
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up --build -d
+# This file: - switches the app to the `localh2` Spring profile,
+#           - removes the dependency on the oracle-db service,
+#           - injects H2 datasource environment variables.
+
+services:
+  app:
+    environment:
+      - SPRING_PROFILES_ACTIVE=localh2
+      - SPRING_DATASOURCE_URL=jdbc:h2:mem:loketdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=gizmo
+    # Remove Oracle dependency so compose won't try to start oracle-db
+    depends_on: []
+
+# Optional: you can also start only app+keycloak+sonarqube without Oracle:
+# docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up --build -d app keycloak keycloak-db sonarqube sonarqube-db
