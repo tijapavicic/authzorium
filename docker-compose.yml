@@ -44,8 +44,11 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: loket-keycloak
+    # Map host 8087 to the container HTTP port 8080 (Keycloak listens on 8080)
     ports:
-      - "8087:8087"
+      - "8087:8080"
+    # Start Keycloak in development mode so the container actually launches the server
+    command: ["start-dev"]
     environment:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=admin

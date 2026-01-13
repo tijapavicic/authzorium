@@ -129,8 +129,8 @@ Files added:
 How to start Oracle with Docker Compose
 
 ```bash
-docker buildx imagetools inspect quay.io/keycloak/keycloak:latest
-
+#docker buildx imagetools inspect quay.io/keycloak/keycloak:latest
+docker compose run --service-ports keycloak start-dev
 # from repo root
 docker-compose up -d
 docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up --build -d
@@ -257,3 +257,50 @@ how to run only the logging tests quickly:
 ```
 
 test-curls.sh
+
+## Local Docker / Make targets (quick)
+
+- Start the project in H2/dev mode (skip Oracle): run `make up-h2` from the repository root. This target runs the compose files used for local H2/dev testing and does not trigger image builds (it uses `docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d`).
+
+- Stop and clean up containers and named volumes: `make down-h2` (runs `docker compose down -v`).
+
+- Start only Keycloak (and its Postgres DB) without starting all services:
+  - Detached (recommended for local testing):
+    `docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d keycloak-db keycloak`
+  - Interactive/dev run (one-off; useful for debugging startup):
+    `docker compose run --rm --service-ports keycloak start-dev`
+
+- Access Keycloak admin UI (when running via the compose setup in this repo):
+  - Open: http://localhost:8087/admin/ (Keycloak is mapped to host port 8087 -> container port 8080 in the compose file).
+
+- Admin/bootstrap environment variables (recommended):
+  - Note: `KEYCLOAK_ADMIN` / `KEYCLOAK_ADMIN_PASSWORD` are deprecated in newer Keycloak versions. Prefer using the bootstrap variables `KC_BOOTSTRAP_ADMIN_USERNAME` and `KC_BOOTSTRAP_ADMIN_PASSWORD` in `docker-compose.yml` or your environment when you want to create a permanent admin user during container startup.
+  - For quick local dev we set an admin user via compose envs (dev only). For production use `start` (not `start-dev`) and use secure bootstrap / secrets management.
+
+- Troubleshooting tip: if host port 8087 is already in use, pick a different host port in the `ports:` mapping (e.g. `9097:8080`) or stop the process/container holding 8087.
+
+### Quick copyable commands
+
+Run these exact commands from the repository root (copy-paste into a zsh terminal):
+
+```bash
+# Start H2/dev (detached)
+make up-h2
+
+# Stop and remove containers + named volumes
+make down-h2
+
+# Start only Keycloak (detached)
+docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d keycloak-db keycloak
+
+# One-off interactive/dev Keycloak run (useful for debugging startup)
+docker compose run --rm --service-ports keycloak start-dev
+
+# Follow Keycloak logs
+docker logs -f loket-keycloak
+
+# Quick HTTP probe for admin UI
+curl -I http://localhost:8087/
+```
+
+- If you prefer a different host port for Keycloak, edit the `ports:` mapping in `docker-compose.yml` (for example use `9097:8080` instead of `8087:8080`).
