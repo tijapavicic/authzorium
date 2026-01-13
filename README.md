@@ -296,6 +296,10 @@ docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d key
 # One-off interactive/dev Keycloak run (useful for debugging startup)
 docker compose run --rm --service-ports keycloak start-dev
 
+# Example: set bootstrap admin envs in your shell (or put them in .env)
+export KC_BOOTSTRAP_ADMIN_USERNAME=admin
+export KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+
 # Follow Keycloak logs
 docker logs -f loket-keycloak
 
