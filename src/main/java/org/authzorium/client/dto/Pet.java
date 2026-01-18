@@ -11,10 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 @ToString
 public class Pet {
-    private Long id;
 
+    private Long id;
     @NotBlank
     private String petName;
-
     private User owner;
 }

@@ -3,12 +3,12 @@ package org.authzorium.client.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.dto.HelloResponse;
 import org.authzorium.client.dto.User;
+import org.authzorium.client.dto.Pet;
 import org.authzorium.client.service.HelloService;
 import org.authzorium.client.util.LoggingConstants;
 
 import org.slf4j.MDC;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,11 +27,9 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final HelloService helloService;
-    private final ConfigurableEnvironment env;
 
     public UserController(HelloService helloService, ConfigurableApplicationContext ctx) {
         this.helloService = helloService;
-        this.env = ctx.getEnvironment();
     }
 
     // Map username as a path variable to make the endpoint explicit and RESTful.
@@ -39,9 +38,9 @@ public class UserController {
         String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
         log.info(LoggingConstants.flow, "Handling /findByUsername request [{}] for userName={}", requestId, userName);
 
-        String greeting = helloService.findByUsername(userName);
-
-        HelloResponse resp = new HelloResponse(greeting, null);
+        User user = helloService.findUserByUsername(userName);
+        String greeting = user != null ? "Hello, " + user.getDisplayName() + "!" : "Hello, secured world!";
+        HelloResponse resp = new HelloResponse(greeting, userName);
         log.debug(LoggingConstants.flow, "/findByUsername response [{}] -> {}", requestId, resp);
         return resp;
     }
@@ -56,5 +55,14 @@ public class UserController {
         User saved = helloService.saveUser(user);
         if (saved == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(saved);
+    }
+
+    // Fetch all pets of a user by userName
+    @GetMapping(value = "/{userName}/pets", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Pet>> getUserPets(@PathVariable("userName") String userName) {
+        String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
+        log.info(LoggingConstants.flow, "Handling /users/{}/pets request [{}]", userName, requestId);
+        List<Pet> pets = helloService.getPetsOfUser(userName);
+        return ResponseEntity.ok(pets);
     }
 }
