@@ -4,10 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.dto.HelloResponse;
 import org.authzorium.client.dto.User;
 import org.authzorium.client.service.HelloService;
+import org.authzorium.client.util.LoggingConstants;
 
 import org.slf4j.MDC;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.http.MediaType;
@@ -28,7 +27,6 @@ public class UserController {
 
     private final HelloService helloService;
     private final ConfigurableEnvironment env;
-    private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     public UserController(HelloService helloService, ConfigurableApplicationContext ctx) {
         this.helloService = helloService;
@@ -38,13 +36,13 @@ public class UserController {
     // Map username as a path variable to make the endpoint explicit and RESTful.
     @GetMapping(value = "/findByUsername/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
     public HelloResponse findByUsername(@PathVariable("userName") String userName) {
-        String requestId = MDC.get("requestId");
-        log.info(FLOW, "Handling /findByUsername request [{}] for userName={}", requestId, userName);
+        String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
+        log.info(LoggingConstants.flow, "Handling /findByUsername request [{}] for userName={}", requestId, userName);
 
         String greeting = helloService.findByUsername(userName);
 
         HelloResponse resp = new HelloResponse(greeting, null);
-        log.debug(FLOW, "/findByUsername response [{}] -> {}", requestId, resp);
+        log.debug(LoggingConstants.flow, "/findByUsername response [{}] -> {}", requestId, resp);
         return resp;
     }
 
@@ -52,8 +50,8 @@ public class UserController {
     // With the class-level @RequestMapping("/users"), an empty @PostMapping maps to POST /users
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> saveUser(@Valid @RequestBody User user) {
-        String requestId = MDC.get("requestId");
-        log.info(FLOW, "Handling /users POST request [{}] user={}", requestId, user == null ? null : user.getUsername());
+        String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
+        log.info(LoggingConstants.flow, "Handling /users POST request [{}] user={}", requestId, user == null ? null : user.getUsername());
 
         User saved = helloService.saveUser(user);
         if (saved == null) return ResponseEntity.badRequest().build();
