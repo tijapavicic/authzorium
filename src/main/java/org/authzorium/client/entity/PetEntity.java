@@ -6,8 +6,10 @@ import lombok.*;
 @Setter
 @Getter
 @Entity
+@Builder
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "pet")
 public class PetEntity {
 

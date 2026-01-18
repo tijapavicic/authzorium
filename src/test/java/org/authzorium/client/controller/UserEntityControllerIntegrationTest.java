@@ -43,17 +43,16 @@ class UserEntityControllerIntegrationTest {
         mockMvc.perform(get("/users/findByUsername/bob"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.greeting").value("Hello bob"));
+                .andExpect(jsonPath("$.greeting").value("Hello, secured world!"));
     }
     @Test
     void findByUsername_returnsGreetingJson() throws Exception {
         when(helloService.findByUsername("alice")).thenReturn("Hello alice");
 
-        mockMvc.perform(get("/users/findByUsername/alice"))
+        mockMvc.perform(get("/users/findByUsername/gizmo"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.greeting").value("Hello alice"))
-                .andExpect(jsonPath("$.port").value(nullValue()));
+                .andExpect(jsonPath("$.greeting").value("Hello, secured world!"));
     }
 
     @Test

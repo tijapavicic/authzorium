@@ -2,37 +2,41 @@ package org.authzorium.client.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.authzorium.client.dto.Pet;
 import org.authzorium.client.dto.User;
+import org.authzorium.client.entity.PetEntity;
 import org.authzorium.client.entity.UserEntity;
+import org.authzorium.client.mapper.PetMapper;
 import org.authzorium.client.mapper.UserMapper;
+import org.authzorium.client.repository.PetRepository;
 import org.authzorium.client.repository.UserRepository;
 import org.authzorium.client.service.HelloService;
 import org.authzorium.client.util.LoggingConstants;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service("helloService")
 public class HelloServiceImpl implements HelloService {
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PetRepository petRepository;
+    private final PetMapper petMapper;
 
     @Override
     public String hello() {
         String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
         log.debug(LoggingConstants.flow, "HelloService.hello called [{}]", requestId);
 
-        if (userRepository != null) {
-            Optional<UserEntity> maybe = userRepository.findByUsername("demo-user");
-            if (maybe.isPresent()) {
-                String ret = "Hello, " + maybe.get().getDisplayName() + "!";
-                log.debug(LoggingConstants.flow, "Found user for hello [{}]: {}", requestId, maybe.get().getUsername());
-                return ret;
-            }
+        Optional<UserEntity> maybe = userRepository.findByUsername("demo-user");
+        if (maybe.isPresent()) {
+            String ret = "Hello, " + maybe.get().getDisplayName() + "!";
+            log.debug(LoggingConstants.flow, "Found user for hello [{}]: {}", requestId, maybe.get().getUsername());
+            return ret;
         }
         log.debug(LoggingConstants.flow, "No user found for hello [{}], returning default greeting", requestId);
         return "Hello, secured world!";
@@ -43,13 +47,11 @@ public class HelloServiceImpl implements HelloService {
         String requestId = MDC.get(LoggingConstants.MDC_REQUEST_ID);
         log.debug(LoggingConstants.flow, "HelloService.hello called [{}]", requestId);
 
-        if (userRepository != null) {
-            Optional<UserEntity> maybe = userRepository.findByUsername(userName);
-            if (maybe.isPresent()) {
-                String ret = "Hello, " + maybe.get().getDisplayName() + "!";
-                log.debug(LoggingConstants.flow, "Found user for hello [{}]: {}", requestId, maybe.get().getUsername());
-                return ret;
-            }
+        Optional<UserEntity> maybe = userRepository.findByUsername(userName);
+        if (maybe.isPresent()) {
+            String ret = "Hello, " + maybe.get().getDisplayName() + "!";
+            log.debug(LoggingConstants.flow, "Found user for hello [{}]: {}", requestId, maybe.get().getUsername());
+            return ret;
         }
         log.debug(LoggingConstants.flow, "No user found for hello [{}], returning default greeting", requestId);
         return "Hello, secured world!";
@@ -66,5 +68,21 @@ public class HelloServiceImpl implements HelloService {
         User out = userMapper.toDto(saved);
         log.debug(LoggingConstants.flow, "Saved user [{}] -> id={}", user.getUsername(), out.getId());
         return out;
+    }
+
+    @Override
+    public User findUserByUsername(String userName) {
+        Optional<UserEntity> maybe = userRepository.findByUsername(userName);
+        return maybe.map(userMapper::toDto).orElse(null);
+    }
+
+    @Override
+    public List<Pet> getPetsOfUser(String userName) {
+        // Fetch all pets for the user in a single query (avoids N+1)
+        Long userId = userRepository.findByUsername(userName)
+                .map(UserEntity::getId)
+                .orElseThrow(() -> new IllegalArgumentException(String.format("User not found for username : {}", userName)));
+        List<PetEntity> pets = petRepository.findByOwnerId(userId);
+        return pets.stream().map(petMapper::toDto).toList();
     }
 }

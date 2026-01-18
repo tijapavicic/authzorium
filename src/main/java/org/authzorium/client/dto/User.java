@@ -11,8 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 @AllArgsConstructor
 @ToString
 public class User {
-    private Long id;
 
+    private Long id;
     @NotBlank
     private String username;
     @NotBlank
