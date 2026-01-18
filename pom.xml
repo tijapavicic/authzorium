@@ -18,6 +18,8 @@
         <lombok.version>1.18.42</lombok.version>
         <!-- Set JaCoCo off by default; enable in CI with -Djacoco.skip=false -->
         <jacoco.skip>true</jacoco.skip>
+        <!-- Centralized Blaze-Persistence version property -->
+        <blaze.persistence.version>1.6.17</blaze.persistence.version>
     </properties>
 
     <repositories>
@@ -134,22 +136,22 @@
         <dependency>
             <groupId>com.blazebit</groupId>
             <artifactId>blaze-persistence-core-impl-jakarta</artifactId>
-            <version>1.6.17</version>
+            <version>${blaze.persistence.version}</version>
         </dependency>
         <dependency>
             <groupId>com.blazebit</groupId>
             <artifactId>blaze-persistence-entity-view-api-jakarta</artifactId>
-            <version>1.6.17</version>
+            <version>${blaze.persistence.version}</version>
         </dependency>
         <dependency>
             <groupId>com.blazebit</groupId>
             <artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>
-            <version>1.6.17</version>
+            <version>${blaze.persistence.version}</version>
         </dependency>
         <dependency>
             <groupId>com.blazebit</groupId>
             <artifactId>blaze-persistence-integration-hibernate6-base</artifactId>
-            <version>1.6.17</version>
+            <version>${blaze.persistence.version}</version>
         </dependency>
     </dependencies>
 
