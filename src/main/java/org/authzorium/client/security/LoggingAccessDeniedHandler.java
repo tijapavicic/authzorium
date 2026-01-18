@@ -3,6 +3,7 @@ package org.authzorium.client.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.controller.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
 
+@Slf4j
 @Component
 public class LoggingAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
-    private final Logger logger = LoggerFactory.getLogger(LoggingAccessDeniedHandler.class);
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     public LoggingAccessDeniedHandler() {
@@ -38,9 +39,9 @@ public class LoggingAccessDeniedHandler implements AccessDeniedHandler {
         if (remoteIp == null || remoteIp.isBlank()) remoteIp = request.getRemoteAddr();
 
         // Log access denied without exception object to avoid stacktrace in normal logs
-        logger.warn("Access denied to {} from {} headers={} : {}", request.getRequestURI(), remoteIp, request.getHeaderNames(), accessDeniedException.getMessage());
+        log.warn("Access denied to {} from {} headers={} : {}", request.getRequestURI(), remoteIp, request.getHeaderNames(), accessDeniedException.getMessage());
         // Debug short form
-        logger.debug("AccessDeniedException for {} -> {}", request.getRequestURI(), accessDeniedException.toString());
+        log.debug("AccessDeniedException for {} -> {}", request.getRequestURI(), accessDeniedException.toString());
 
         HttpStatus status = HttpStatus.FORBIDDEN;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), accessDeniedException.getMessage(), request.getRequestURI());
@@ -48,6 +49,6 @@ public class LoggingAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         objectMapper.writeValue(response.getOutputStream(), body);
 
-        logger.debug(FLOW, "Forbidden response [{}] -> {}", requestId, objectMapper.writeValueAsString(body));
+        log.debug(FLOW, "Forbidden response [{}] -> {}", requestId, objectMapper.writeValueAsString(body));
     }
 }

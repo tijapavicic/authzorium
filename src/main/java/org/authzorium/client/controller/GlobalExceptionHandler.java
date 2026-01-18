@@ -3,8 +3,7 @@ package org.authzorium.client.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.persistence.EntityNotFoundException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.core.Ordered;
@@ -27,11 +26,11 @@ import java.time.Instant;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.access.AccessDeniedException;
 
+@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler implements GlobalExceptionHandlerI {
-
-    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     @ExceptionHandler(Exception.class)
@@ -40,8 +39,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.error("Unhandled exception for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
-        logger.debug(FLOW, "Unhandled exception response -> {}", body);
+        log.error("Unhandled exception for request {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        log.debug(FLOW, "Unhandled exception response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -51,8 +50,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.warn("Bad request for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "Bad request response -> {}", body);
+        log.warn("Bad request for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "Bad request response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -62,8 +61,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleUnauthorized(AuthenticationException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.warn("Authentication failure for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "Unauthorized response -> {}", body);
+        log.warn("Authentication failure for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "Unauthorized response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -73,8 +72,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleInsufficientUnauthorized(InsufficientAuthenticationException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.warn("Insufficient authentication for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "Insufficient auth response -> {}", body);
+        log.warn("Insufficient authentication for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "Insufficient auth response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -85,8 +84,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         String message = "Invalid or expired JWT token";
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), message, request.getRequestURI());
-        logger.warn("JWT validation failed for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "JWT error response -> {}", body);
+        log.warn("JWT validation failed for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "JWT error response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -96,8 +95,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.warn("Access denied for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "Access denied response -> {}", body);
+        log.warn("Access denied for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "Access denied response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -107,8 +106,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
     public ResponseEntity<ErrorResponse> handleEntityNotFound(EntityNotFoundException ex, HttpServletRequest request) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         ErrorResponse body = new ErrorResponse(Instant.now(), status.value(), status.getReasonPhrase(), ex.getMessage(), request.getRequestURI());
-        logger.info("Entity not found for {}: {}", request.getRequestURI(), ex.getMessage());
-        logger.debug(FLOW, "Entity not found response -> {}", body);
+        log.info("Entity not found for {}: {}", request.getRequestURI(), ex.getMessage());
+        log.debug(FLOW, "Entity not found response -> {}", body);
         return new ResponseEntity<>(body, status);
     }
 
@@ -131,8 +130,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler imple
                 .orElse(ex.getMessage());
 
         ErrorResponse body = new ErrorResponse(Instant.now(), resolvedStatus.value(), resolvedStatus.getReasonPhrase(), message, path);
-        logger.warn("Validation failed for {}: {}", path, message);
-        logger.debug(FLOW, "Validation error response -> {}", body);
+        log.warn("Validation failed for {}: {}", path, message);
+        log.debug(FLOW, "Validation error response -> {}", body);
         return new ResponseEntity<>(body, headers, resolvedStatus);
     }
 }

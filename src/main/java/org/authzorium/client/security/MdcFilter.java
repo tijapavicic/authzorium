@@ -1,5 +1,6 @@
 package org.authzorium.client.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -22,6 +23,7 @@ import java.util.UUID;
  * - Uses X-Request-ID header if provided, otherwise generates a UUID.
  * - Extracts remote IP from X-Forwarded-For when present.
  */
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class MdcFilter extends OncePerRequestFilter {
@@ -29,8 +31,7 @@ public class MdcFilter extends OncePerRequestFilter {
     private static final String REQUEST_ID_HEADER = "X-Request-ID";
     private static final String MDC_REQUEST_ID = "requestId";
     private static final String MDC_REMOTE_IP = "remoteIp";
-
-    private final Logger logger = LoggerFactory.getLogger(MdcFilter.class);
+    
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     @Override
@@ -57,7 +58,7 @@ public class MdcFilter extends OncePerRequestFilter {
         response.setHeader(REQUEST_ID_HEADER, requestId);
 
         // Detailed start log to trace the request flow
-        logger.debug(FLOW, "Start request: [{}] {} {} from {}", requestId, request.getMethod(), request.getRequestURI(), remoteIp);
+        log.debug(FLOW, "Start request: [{}] {} {} from {}", requestId, request.getMethod(), request.getRequestURI(), remoteIp);
 
         try {
             filterChain.doFilter(request, response);
@@ -65,9 +66,9 @@ public class MdcFilter extends OncePerRequestFilter {
             // Log the completed status so flows can be correlated in logs
             try {
                 int status = response.getStatus();
-                logger.debug(FLOW, "End request: [{}] {} {} -> status={} (from {})", requestId, request.getMethod(), request.getRequestURI(), status, remoteIp);
+                log.debug(FLOW, "End request: [{}] {} {} -> status={} (from {})", requestId, request.getMethod(), request.getRequestURI(), status, remoteIp);
             } catch (Exception e) {
-                logger.debug(FLOW, "End request (failed to read status) [{}] {} {}", requestId, request.getMethod(), request.getRequestURI());
+                log.debug(FLOW, "End request (failed to read status) [{}] {} {}", requestId, request.getMethod(), request.getRequestURI());
             }
             MDC.remove(MDC_REQUEST_ID);
             MDC.remove(MDC_REMOTE_IP);

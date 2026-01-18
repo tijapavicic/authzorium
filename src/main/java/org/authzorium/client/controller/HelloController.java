@@ -1,9 +1,9 @@
 package org.authzorium.client.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.dto.HelloResponse;
 import org.authzorium.client.service.HelloService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -12,12 +12,12 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 public class HelloController {
 
     private final HelloService helloService;
     private final ConfigurableEnvironment env;
-    private final Logger logger = LoggerFactory.getLogger(HelloController.class);
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     public HelloController(HelloService helloService, ConfigurableApplicationContext ctx) {
@@ -28,7 +28,7 @@ public class HelloController {
     @GetMapping("/hello")
     public HelloResponse hello() {
         String requestId = MDC.get("requestId");
-        logger.info(FLOW, "Handling /hello request [{}]", requestId);
+        log.info(FLOW, "Handling /hello request [{}]", requestId);
 
         String greeting = helloService.hello();
 
@@ -38,7 +38,7 @@ public class HelloController {
         }
 
         HelloResponse resp = new HelloResponse(greeting, port);
-        logger.debug(FLOW, "/hello response [{}] -> {}", requestId, resp);
+        log.debug(FLOW, "/hello response [{}] -> {}", requestId, resp);
         return resp;
     }
 }

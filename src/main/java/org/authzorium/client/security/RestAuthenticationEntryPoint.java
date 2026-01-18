@@ -3,6 +3,7 @@ package org.authzorium.client.security;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.controller.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
-
+@Slf4j
 @Component
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
-    private final Logger logger = LoggerFactory.getLogger(RestAuthenticationEntryPoint.class);
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     public RestAuthenticationEntryPoint() {
@@ -40,9 +40,9 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         if (remoteIp == null || remoteIp.isBlank()) remoteIp = request.getRemoteAddr();
 
         // Log the unauthorized access without exception object to avoid stacktrace in standard logs
-        logger.warn("Unauthorized request to {} from {} headers={} : {}", request.getRequestURI(), remoteIp, request.getHeaderNames(), authException.getMessage());
+        log.warn("Unauthorized request to {} from {} headers={} : {}", request.getRequestURI(), remoteIp, request.getHeaderNames(), authException.getMessage());
         // If debug enabled, log short form of the exception (no stacktrace)
-        logger.debug("Unauthorized request for {} -> {}", request.getRequestURI(), authException.toString());
+        log.debug("Unauthorized request for {} -> {}", request.getRequestURI(), authException.toString());
 
         HttpStatus status = HttpStatus.UNAUTHORIZED;
 
@@ -60,6 +60,6 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         objectMapper.writeValue(response.getOutputStream(), body);
 
         // Log the body at debug with FLOW marker so request flow file captures it
-        logger.debug(FLOW, "Unauthorized response [{}] -> {}", requestId, objectMapper.writeValueAsString(body));
+        log.debug(FLOW, "Unauthorized response [{}] -> {}", requestId, objectMapper.writeValueAsString(body));
     }
 }
