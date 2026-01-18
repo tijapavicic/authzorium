@@ -13,7 +13,9 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.1.6</spring.boot.version>
-        <lombok.version>1.18.36</lombok.version>
+<!--        <lombok.version>1.18.36</lombok.version>-->
+<!--        java 25 is compatible with fresher lombok-->
+        <lombok.version>1.18.42</lombok.version>
         <!-- Set JaCoCo off by default; enable in CI with -Djacoco.skip=false -->
         <jacoco.skip>true</jacoco.skip>
     </properties>
