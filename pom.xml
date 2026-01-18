@@ -9,8 +9,10 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <!-- Use a single property for Java version so it's easy to change project-wide -->
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.1.6</spring.boot.version>
 <!--        <lombok.version>1.18.36</lombok.version>-->
@@ -19,7 +21,8 @@
         <!-- Set JaCoCo off by default; enable in CI with -Djacoco.skip=false -->
         <jacoco.skip>true</jacoco.skip>
         <!-- Centralized Blaze-Persistence version property -->
-        <blaze.persistence.version>1.6.16</blaze.persistence.version>
+        <blaze.persistence.version>1.5.6</blaze.persistence.version>
+        <hibernate.version>5.6.15.Final</hibernate.version>
     </properties>
 
     <repositories>
@@ -33,7 +36,8 @@
         <repository>
             <id>blazebit</id>
             <name>Blazebit Public Repository</name>
-            <url>https://repo.blazebit.com/repository/maven-public/</url>
+            <!-- Use the base host (blazebit.com) to avoid certificate subjectAltName mismatch with repo.blazebit.com -->
+            <url>https://blazebit.com/repository/maven-public/</url>
         </repository>
         <!-- ... -->
         <repository>
@@ -54,6 +58,11 @@
                 <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>${hibernate.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -138,7 +147,24 @@
             <version>1.5.5.Final</version>
         </dependency>
 
-        <!-- Blaze-Persistence: JPA Criteria and Entity-View enhancements (Jakarta/Hibernate6) -->
+        <!-- Blaze-Persistence: JPA Criteria and Entity-View enhancements (classic javax, Hibernate 5.6) -->
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-core-impl</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-api</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-impl</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+        <!-- Remove Jakarta Blaze dependencies -->
+        <!--
         <dependency>
             <groupId>com.blazebit</groupId>
             <artifactId>blaze-persistence-core-impl-jakarta</artifactId>
@@ -154,7 +180,8 @@
             <artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>
             <version>${blaze.persistence.version}</version>
         </dependency>
-        <!-- NOTE: the Blaze-Hibernate integration artifact is test-scoped and is resolved only when the blazebit integration profile is enabled. See profile `blaze-integration` at the end of this POM. -->
+        -->
+        <!-- ...existing code... -->
     </dependencies>
 
     <build>
@@ -186,7 +213,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>17</version>
+                                    <version>${java.version}</version>
                                     <message>Build requires JDK 17. Set JAVA_HOME to a Java 17 installation or install
                                         one (e.g. temurin17 via Homebrew).
                                     </message>
@@ -219,7 +246,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
                 <configuration>
-                    <release>17</release>
+                    <release>${java.version}</release>
                     <fork>true</fork>
                     <compilerArgs>
                         <arg>-XDignore.symbol.file</arg>
@@ -328,14 +355,15 @@
                 <repository>
                     <id>blazebit</id>
                     <name>Blazebit Public Repository</name>
-                    <url>https://repo.blazebit.com/repository/maven-public/</url>
+                    <!-- Use the base host (blazebit.com) to avoid certificate subjectAltName mismatch with repo.blazebit.com -->
+                    <url>https://blazebit.com/repository/maven-public/</url>
                 </repository>
             </repositories>
 
             <dependencies>
                 <dependency>
                     <groupId>com.blazebit</groupId>
-                    <artifactId>blaze-persistence-integration-hibernate6-base</artifactId>
+                    <artifactId>blaze-persistence-integration-hibernate5</artifactId>
                     <version>${blaze.persistence.version}</version>
                     <scope>test</scope>
                 </dependency>
@@ -349,6 +377,7 @@
                         <configuration>
                             <useModulePath>false</useModulePath>
                             <!-- When this profile is active, don't exclude IntegrationTest classes so they run. -->
+                            <excludes></excludes>
                         </configuration>
                     </plugin>
                 </plugins>

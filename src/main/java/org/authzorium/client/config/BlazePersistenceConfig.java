@@ -9,17 +9,29 @@ import jakarta.persistence.EntityManagerFactory;
 import org.authzorium.client.view.PetView;
 import org.authzorium.client.view.UserView;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(name = "enable.blaze.integration", havingValue = "true")
 public class BlazePersistenceConfig {
 
     @Bean
     public CriteriaBuilderFactory criteriaBuilderFactory(EntityManagerFactory emf) {
         // Unwrap the Hibernate SessionFactory (integration module expects a Hibernate SessionFactory)
         SessionFactory sessionFactory = emf.unwrap(SessionFactory.class);
-        return Criteria.getDefault().createCriteriaBuilderFactory(sessionFactory);
+        try {
+            return Criteria.getDefault().createCriteriaBuilderFactory(sessionFactory);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            // Provide a clearer message when the Blaze-Persistence Hibernate integrator is missing
+            String msg = "Blaze-Persistence Hibernate integration not found on the classpath. "
+                    + "If you intended to enable Blaze integration, activate the 'blaze-integration' profile and ensure the "
+                    + "provider artifact (com.blazebit:blaze-persistence-integration-hibernate6:${blaze.persistence.version}) is resolvable. "
+                    + "Original error: " + ex.getMessage();
+            throw new BeanCreationException(msg, ex);
+        }
     }
 
     @Bean
