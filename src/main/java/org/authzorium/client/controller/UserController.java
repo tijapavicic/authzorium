@@ -2,7 +2,7 @@ package org.authzorium.client.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.authzorium.client.dto.HelloResponse;
-import org.authzorium.client.entity.UserEntity;
+import org.authzorium.client.dto.User;
 import org.authzorium.client.service.HelloService;
 
 import org.slf4j.MDC;
@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import jakarta.validation.Valid;
 
 @Slf4j
 @RestController
@@ -46,14 +48,14 @@ public class UserController {
         return resp;
     }
 
-    // Create a new userEntity - accepts JSON body and returns the saved userEntity (with id)
+    // Create a new user - accepts JSON body and returns the saved user (with id)
     // With the class-level @RequestMapping("/users"), an empty @PostMapping maps to POST /users
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserEntity> saveUser(@RequestBody UserEntity userEntity) {
+    public ResponseEntity<User> saveUser(@Valid @RequestBody User user) {
         String requestId = MDC.get("requestId");
-        log.info(FLOW, "Handling /users POST request [{}] userEntity={}", requestId, userEntity == null ? null : userEntity.getUsername());
+        log.info(FLOW, "Handling /users POST request [{}] user={}", requestId, user == null ? null : user.getUsername());
 
-        UserEntity saved = helloService.saveUser(userEntity);
+        User saved = helloService.saveUser(user);
         if (saved == null) return ResponseEntity.badRequest().build();
         return ResponseEntity.ok(saved);
     }

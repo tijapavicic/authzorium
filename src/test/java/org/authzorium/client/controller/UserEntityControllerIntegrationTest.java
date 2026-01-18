@@ -1,7 +1,7 @@
 package org.authzorium.client.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.authzorium.client.entity.UserEntity;
+import org.authzorium.client.dto.User;
 import org.authzorium.client.service.HelloService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,11 +58,10 @@ class UserEntityControllerIntegrationTest {
 
     @Test
     void saveUser_returnsSavedUser() throws Exception {
-        UserEntity input = new UserEntity("newuser", "New UserEntity");
-        UserEntity saved = new UserEntity("newuser", "New UserEntity");
-        saved.setId(42L);
+        User input = new User(null, "newuser", "New UserEntity");
+        User saved = new User(42L, "newuser", "New UserEntity");
 
-        when(helloService.saveUser(any(UserEntity.class))).thenReturn(saved);
+        when(helloService.saveUser(any(User.class))).thenReturn(saved);
 
         mockMvc.perform(post("/users")
                         .with(csrf())
@@ -72,5 +71,22 @@ class UserEntityControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").value(42))
                 .andExpect(jsonPath("$.username").value("newuser"))
                 .andExpect(jsonPath("$.displayName").value("New UserEntity"));
+    }
+
+    @Test
+    void saveUser_validationFailure_missingUsername_returnsBadRequest() throws Exception {
+        // Missing username -> invalid
+        User invalid = new User(null, "", "No Username");
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalid)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").isNotEmpty())
+                .andExpect(jsonPath("$.path").value("/users"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 }

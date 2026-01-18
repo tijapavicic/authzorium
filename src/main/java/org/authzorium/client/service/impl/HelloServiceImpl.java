@@ -2,7 +2,9 @@ package org.authzorium.client.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.authzorium.client.dto.User;
 import org.authzorium.client.entity.UserEntity;
+import org.authzorium.client.mapper.UserMapper;
 import org.authzorium.client.repository.UserRepository;
 import org.authzorium.client.service.HelloService;
 import org.slf4j.MDC;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class HelloServiceImpl implements HelloService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
     @Override
@@ -55,12 +58,15 @@ public class HelloServiceImpl implements HelloService {
     }
 
     @Override
-    public UserEntity saveUser(UserEntity userEntity) {
+    public User saveUser(User user) {
         String requestId = MDC.get("requestId");
-        log.debug(FLOW, "HelloService.saveUser called [{}] userEntity={}", requestId, userEntity == null ? null : userEntity.getUsername());
-        if (userEntity == null) return null;
-        UserEntity saved = userRepository.save(userEntity);
-        log.debug(FLOW, "Saved userEntity [{}] -> id={}", userEntity.getUsername(), saved.getId());
-        return saved;
+        log.debug(FLOW, "HelloService.saveUser called [{}] user={}", requestId, user == null ? null : user.getUsername());
+        if (user == null) return null;
+
+        UserEntity entity = userMapper.toEntity(user);
+        UserEntity saved = userRepository.save(entity);
+        User out = userMapper.toDto(saved);
+        log.debug(FLOW, "Saved user [{}] -> id={}", user.getUsername(), out.getId());
+        return out;
     }
 }
