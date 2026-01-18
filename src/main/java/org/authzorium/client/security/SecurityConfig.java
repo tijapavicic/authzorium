@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.Ordered;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -45,18 +46,18 @@ public class SecurityConfig {
     // Inject the secret from properties; fallback to the previous literal so existing behavior remains
     private final String jwtSecret;
     private final AccessDeniedHandler accessDeniedHandler;
-    private final Environment env;
+    private final ConfigurableEnvironment env;
 
     private static final String LOCAL_H2_PROFILE = "localh2";
 
     public SecurityConfig(RestAuthenticationEntryPoint authenticationEntryPoint,
                           @Value("${security.jwt.secret:changeit-changeit-changeit-changeit}") String jwtSecret,
                           AccessDeniedHandler accessDeniedHandler,
-                          Environment env) {
+                          ConfigurableApplicationContext ctx) {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.jwtSecret = jwtSecret;
         this.accessDeniedHandler = accessDeniedHandler;
-        this.env = env;
+        this.env = ctx.getEnvironment();
     }
 
     private boolean isLocalH2Active() {

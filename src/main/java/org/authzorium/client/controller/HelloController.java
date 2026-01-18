@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloController {
 
     private final HelloService helloService;
-    private final Environment env;
+    private final ConfigurableEnvironment env;
     private final Logger logger = LoggerFactory.getLogger(HelloController.class);
     private final Marker FLOW = MarkerFactory.getMarker("FLOW");
 
-    public HelloController(HelloService helloService, Environment env) {
+    public HelloController(HelloService helloService, ConfigurableApplicationContext ctx) {
         this.helloService = helloService;
-        this.env = env;
+        this.env = ctx.getEnvironment();
     }
 
     @GetMapping("/hello")

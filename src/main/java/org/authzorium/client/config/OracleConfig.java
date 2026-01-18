@@ -3,7 +3,8 @@ package org.authzorium.client.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 
 import javax.sql.DataSource;
@@ -13,7 +14,8 @@ import javax.sql.DataSource;
 public class OracleConfig {
 
     @Bean
-    public DataSource oracleDataSource(Environment env) {
+    public DataSource oracleDataSource(ConfigurableApplicationContext ctx) {
+        ConfigurableEnvironment env = ctx.getEnvironment();
         return DataSourceBuilder.create()
                 .driverClassName(env.getProperty("spring.datasource.driver-class-name"))
                 .url(env.getProperty("spring.datasource.url"))
@@ -22,4 +24,3 @@ public class OracleConfig {
                 .build();
     }
 }
-

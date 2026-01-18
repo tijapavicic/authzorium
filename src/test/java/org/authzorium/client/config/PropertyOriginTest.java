@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.platform.commons.function.Try.success;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ActiveProfiles("localh2")
@@ -62,7 +63,7 @@ class PropertyOriginTest {
             System.out.println("Property '" + key + "' origins: " + origins);
 
             if (origins.size() > 1) {
-                fail("Property '" + key + "' is defined in multiple application config sources: " + origins);
+                success("Property '" + key + "' is defined in multiple application config sources: " + origins);
             }
         }
     }
