@@ -1,0 +1,60 @@
+package org.authzorium.client.controller;
+
+import lombok.extern.slf4j.Slf4j;
+import org.authzorium.client.dto.HelloResponse;
+import org.authzorium.client.entity.UserEntity;
+import org.authzorium.client.service.HelloService;
+
+import org.slf4j.MDC;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Slf4j
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    private final HelloService helloService;
+    private final ConfigurableEnvironment env;
+    private final Marker FLOW = MarkerFactory.getMarker("FLOW");
+
+    public UserController(HelloService helloService, ConfigurableApplicationContext ctx) {
+        this.helloService = helloService;
+        this.env = ctx.getEnvironment();
+    }
+
+    // Map username as a path variable to make the endpoint explicit and RESTful.
+    @GetMapping(value = "/findByUsername/{userName}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HelloResponse findByUsername(@PathVariable("userName") String userName) {
+        String requestId = MDC.get("requestId");
+        log.info(FLOW, "Handling /findByUsername request [{}] for userName={}", requestId, userName);
+
+        String greeting = helloService.findByUsername(userName);
+
+        HelloResponse resp = new HelloResponse(greeting, null);
+        log.debug(FLOW, "/findByUsername response [{}] -> {}", requestId, resp);
+        return resp;
+    }
+
+    // Create a new userEntity - accepts JSON body and returns the saved userEntity (with id)
+    // With the class-level @RequestMapping("/users"), an empty @PostMapping maps to POST /users
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserEntity> saveUser(@RequestBody UserEntity userEntity) {
+        String requestId = MDC.get("requestId");
+        log.info(FLOW, "Handling /users POST request [{}] userEntity={}", requestId, userEntity == null ? null : userEntity.getUsername());
+
+        UserEntity saved = helloService.saveUser(userEntity);
+        if (saved == null) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(saved);
+    }
+}

@@ -3,8 +3,7 @@ package org.authzorium.client.security;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.authzorium.client.security.LoggingAccessDeniedHandler;
-import org.authzorium.client.security.RestAuthenticationEntryPoint;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

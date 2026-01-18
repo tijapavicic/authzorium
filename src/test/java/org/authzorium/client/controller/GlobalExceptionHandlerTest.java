@@ -1,6 +1,5 @@
 package org.authzorium.client.controller;
 
-import org.authzorium.client.controller.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

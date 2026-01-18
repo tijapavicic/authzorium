@@ -1,7 +1,5 @@
 package org.authzorium.client.security;
 
-import org.authzorium.client.security.RestAuthenticationEntryPoint;
-import org.authzorium.client.security.LoggingAccessDeniedHandler;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;

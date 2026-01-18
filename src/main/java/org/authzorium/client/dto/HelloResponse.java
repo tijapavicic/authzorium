@@ -1,5 +1,8 @@
 package org.authzorium.client.dto;
 
+import lombok.Getter;
+
+@Getter
 public class HelloResponse {
 
     private final String greeting;
@@ -10,12 +13,5 @@ public class HelloResponse {
         this.port = port;
     }
 
-    public String getGreeting() {
-        return greeting;
-    }
-
-    public String getPort() {
-        return port;
-    }
 }
 

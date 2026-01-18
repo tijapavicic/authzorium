@@ -1,9 +1,8 @@
 package org.authzorium.client.service;
 
-import org.authzorium.client.service.HelloService;
+import org.authzorium.client.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.authzorium.BaseTest;
-import org.authzorium.client.model.User;
 import org.authzorium.client.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -23,7 +22,7 @@ class HelloServiceIntegrationTest extends BaseTest {
         userRepository.deleteAll();
 
         // Insert a single demo-user which HelloService looks up
-        userRepository.save(new User("demo-user", "Demo Integration"));
+        userRepository.save(new UserEntity("demo-user", "Demo Integration"));
 
         String greeting = helloService.hello();
         assertEquals("Hello, Demo Integration!", greeting);

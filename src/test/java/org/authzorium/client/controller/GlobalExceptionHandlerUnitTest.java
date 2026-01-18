@@ -2,8 +2,6 @@ package org.authzorium.client.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.authzorium.client.controller.ErrorResponse;
-import org.authzorium.client.controller.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +23,7 @@ import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class GlobalExceptionHandlerUnitTest {
+class GlobalExceptionHandlerUnitTest {
 
     @Test
     void whenValidationFails_handlerProducesErrorResponseShape() throws NoSuchMethodException {

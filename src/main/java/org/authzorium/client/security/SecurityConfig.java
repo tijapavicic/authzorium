@@ -107,6 +107,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/actuator/endpoints")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/hello")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/users/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/admin/**")).hasRole(ADMIN)
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
