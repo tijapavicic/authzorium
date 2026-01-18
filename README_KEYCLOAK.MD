@@ -1,7 +1,11 @@
-
 run Keycloak container with admin user:
 ```bash
-docker run --rm -it -p 8087:8087 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin bahbac/keykloak:local
+# Use Keycloak's bootstrap env vars (KC_BOOTSTRAP_ADMIN_USERNAME / KC_BOOTSTRAP_ADMIN_PASSWORD)
+# Map host 8087 to container 8080
+docker run --rm -it -p 8087:8080 \
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+  -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:latest start-dev
 
 ```
 remove all containers after stopping the Keycloak container

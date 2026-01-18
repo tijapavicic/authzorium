@@ -1,13 +1,13 @@
 .PHONY: up-h2 down-h2 keycloak-up keycloak-down
 
-# Start the project in H2/dev mode (skip Oracle)
-up-h2: ; docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d
+# Start the project in H2/dev mode (skip Oracle). Do not build images from the terminal (--no-build)
+up-h2: ; docker compose -f docker-compose.yml -f docker-compose.skip-oracle.yml up --no-build -d
 
 # Stop and remove containers and named volumes
 down-h2: ; docker compose down -v
 
-# Start only Keycloak (and its Postgres DB) using .env for bootstrap credentials
-keycloak-up: ; docker compose --env-file .env -f docker-compose.yml -f docker-compose.skip-oracle.yml up -d keycloak-db keycloak
+# Start only Keycloak (and its Postgres DB) using .env for bootstrap credentials; do not build images
+keycloak-up: ; docker compose --env-file .env -f docker-compose.yml -f docker-compose.skip-oracle.yml up --no-build -d keycloak-db keycloak
 
 # Stop and remove Keycloak and its DB (stops, then removes containers)
 keycloak-down: ; docker compose --env-file .env -f docker-compose.yml -f docker-compose.skip-oracle.yml stop keycloak keycloak-db && docker compose --env-file .env -f docker-compose.yml -f docker-compose.skip-oracle.yml rm -f keycloak keycloak-db
