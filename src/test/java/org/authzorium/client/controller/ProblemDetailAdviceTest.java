@@ -1,5 +1,7 @@
 package org.authzorium.client.controller;
 
+import org.authzorium.client.dto.ErrorResponse;
+import org.authzorium.client.handler.ProblemDetailAdvice;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.HttpStatus;

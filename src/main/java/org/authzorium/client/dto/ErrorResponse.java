@@ -1,4 +1,4 @@
-package org.authzorium.client.controller;
+package org.authzorium.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;

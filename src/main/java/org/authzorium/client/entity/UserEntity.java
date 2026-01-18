@@ -5,11 +5,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import lombok.*;
 
 @Setter
 @Getter
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Table(name = "app_user")

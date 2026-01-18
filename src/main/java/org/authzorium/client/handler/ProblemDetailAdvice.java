@@ -1,5 +1,6 @@
-package org.authzorium.client.controller;
+package org.authzorium.client.handler;
 
+import org.authzorium.client.dto.ErrorResponse;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;

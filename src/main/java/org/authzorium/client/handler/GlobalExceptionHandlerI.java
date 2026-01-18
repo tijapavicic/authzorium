@@ -1,6 +1,7 @@
-package org.authzorium.client.controller;
+package org.authzorium.client.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.authzorium.client.dto.ErrorResponse;
 import org.springframework.context.MessageSourceAware;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

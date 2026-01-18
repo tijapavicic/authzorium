@@ -1,9 +1,10 @@
-package org.authzorium.client.controller;
+package org.authzorium.client.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.persistence.EntityNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
+import org.authzorium.client.dto.ErrorResponse;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 import org.springframework.core.Ordered;

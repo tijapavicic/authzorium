@@ -2,6 +2,8 @@ package org.authzorium.client.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.authzorium.client.dto.ErrorResponse;
+import org.authzorium.client.handler.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;

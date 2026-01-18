@@ -1,4 +1,4 @@
-package org.authzorium.client.controller;
+package org.authzorium.client.handler;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
