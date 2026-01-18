@@ -129,6 +129,28 @@
             <artifactId>mapstruct</artifactId>
             <version>1.5.5.Final</version>
         </dependency>
+
+        <!-- Blaze-Persistence: JPA Criteria and Entity-View enhancements (Jakarta/Hibernate6) -->
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-core-impl-jakarta</artifactId>
+            <version>1.6.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-api-jakarta</artifactId>
+            <version>1.6.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>
+            <version>1.6.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-integration-hibernate6-base</artifactId>
+            <version>1.6.17</version>
+        </dependency>
     </dependencies>
 
     <build>
