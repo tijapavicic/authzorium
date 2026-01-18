@@ -19,7 +19,7 @@
         <!-- Set JaCoCo off by default; enable in CI with -Djacoco.skip=false -->
         <jacoco.skip>true</jacoco.skip>
         <!-- Centralized Blaze-Persistence version property -->
-        <blaze.persistence.version>1.6.17</blaze.persistence.version>
+        <blaze.persistence.version>1.6.16</blaze.persistence.version>
     </properties>
 
     <repositories>
@@ -28,6 +28,12 @@
             <id>central</id>
             <name>Maven Central</name>
             <url>https://repo1.maven.org/maven2/</url>
+        </repository>
+        <!-- Blazebit public repository (hosts blaze-persistence integration artifacts) -->
+        <repository>
+            <id>blazebit</id>
+            <name>Blazebit Public Repository</name>
+            <url>https://repo.blazebit.com/repository/maven-public/</url>
         </repository>
         <!-- ... -->
         <repository>
@@ -148,11 +154,7 @@
             <artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>
             <version>${blaze.persistence.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-integration-hibernate6-base</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
+        <!-- NOTE: the Blaze-Hibernate integration artifact is test-scoped and is resolved only when the blazebit integration profile is enabled. See profile `blaze-integration` at the end of this POM. -->
     </dependencies>
 
     <build>
@@ -163,6 +165,10 @@
                 <version>3.0.0-M8</version>
                 <configuration>
                     <useModulePath>false</useModulePath>
+                    <!-- Exclude integration tests by default; the profile below will re-enable them when the integration artifact is available. -->
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 
@@ -305,6 +311,50 @@
 
         </plugins>
     </build>
+
+    <!-- Profiles -->
+    <profiles>
+        <profile>
+            <id>blaze-integration</id>
+            <activation>
+                <property>
+                    <name>enable.blaze.integration</name>
+                    <value>true</value>
+                </property>
+            </activation>
+
+            <repositories>
+                <!-- Ensure the blazebit repository is available during profile activation (useful in restrictive environments) -->
+                <repository>
+                    <id>blazebit</id>
+                    <name>Blazebit Public Repository</name>
+                    <url>https://repo.blazebit.com/repository/maven-public/</url>
+                </repository>
+            </repositories>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.blazebit</groupId>
+                    <artifactId>blaze-persistence-integration-hibernate6-base</artifactId>
+                    <version>${blaze.persistence.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <useModulePath>false</useModulePath>
+                            <!-- When this profile is active, don't exclude IntegrationTest classes so they run. -->
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
 
