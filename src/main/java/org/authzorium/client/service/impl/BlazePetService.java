@@ -15,7 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 

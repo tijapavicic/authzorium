@@ -164,6 +164,12 @@
             <artifactId>blaze-persistence-entity-view-impl</artifactId>
             <version>${blaze.persistence.version}</version>
         </dependency>
+        <!-- Compatibility shim: some third-party libs may still reference the javax.persistence API at compile time. -->
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+            <version>2.2</version>
+        </dependency>
 
         <!-- NOTE: Blaze core and entity-view are enabled in the main POM; the integration artifact was removed because it's not available in some environments. If you need automatic integration wiring for certain Hibernate versions, add the appropriate integration artifact in an environment where the blazebit repository is reachable. -->
 
