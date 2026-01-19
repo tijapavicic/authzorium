@@ -21,7 +21,8 @@
         <!-- Set JaCoCo off by default; enable in CI with -Djacoco.skip=false -->
         <jacoco.skip>true</jacoco.skip>
         <!-- Centralized Blaze-Persistence version property -->
-        <blaze.persistence.version>1.5.6</blaze.persistence.version>
+        <!-- Use a recent, available Blaze-Persistence release compatible with Hibernate 5.6 -->
+        <blaze.persistence.version>1.6.17</blaze.persistence.version>
         <hibernate.version>5.6.15.Final</hibernate.version>
     </properties>
 
@@ -147,7 +148,24 @@
             <version>1.5.5.Final</version>
         </dependency>
 
-        <!-- NOTE: Blaze-Persistence dependencies have been moved into the blaze-integration profile to avoid requiring them for the default build -->
+        <!-- Blaze-Persistence: JPA Criteria and Entity-View enhancements (classic, Hibernate 5.6) -->
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-core-impl</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-api</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.blazebit</groupId>
+            <artifactId>blaze-persistence-entity-view-impl</artifactId>
+            <version>${blaze.persistence.version}</version>
+        </dependency>
+
+        <!-- NOTE: Blaze core and entity-view are enabled in the main POM; the integration artifact was removed because it's not available in some environments. If you need automatic integration wiring for certain Hibernate versions, add the appropriate integration artifact in an environment where the blazebit repository is reachable. -->
 
         <!-- ...existing code... -->
     </dependencies>
@@ -329,6 +347,7 @@
             </repositories>
 
             <dependencies>
+                <!-- Add the Blaze integration artifact back into the profile so CI/devs can enable it when they have repository access -->
                 <dependency>
                     <groupId>com.blazebit</groupId>
                     <artifactId>blaze-persistence-integration-hibernate5</artifactId>

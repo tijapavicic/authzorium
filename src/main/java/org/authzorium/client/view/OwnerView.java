@@ -1,7 +1,12 @@
 package org.authzorium.client.view;
 
-// Minimal placeholder for owner view so code compiles when Blaze is not present on the classpath
+import com.blazebit.persistence.view.EntityView;
+import com.blazebit.persistence.view.IdMapping;
+import org.authzorium.client.entity.UserEntity;
+
+@EntityView(UserEntity.class)
 public interface OwnerView {
+    @IdMapping
     Long getId();
     String getUsername();
     String getDisplayName();
