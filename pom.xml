@@ -147,40 +147,8 @@
             <version>1.5.5.Final</version>
         </dependency>
 
-        <!-- Blaze-Persistence: JPA Criteria and Entity-View enhancements (classic javax, Hibernate 5.6) -->
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-core-impl</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-entity-view-api</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-entity-view-impl</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        <!-- Remove Jakarta Blaze dependencies -->
-        <!--
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-core-impl-jakarta</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-entity-view-api-jakarta</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.blazebit</groupId>
-            <artifactId>blaze-persistence-entity-view-impl-jakarta</artifactId>
-            <version>${blaze.persistence.version}</version>
-        </dependency>
-        -->
+        <!-- NOTE: Blaze-Persistence dependencies have been moved into the blaze-integration profile to avoid requiring them for the default build -->
+
         <!-- ...existing code... -->
     </dependencies>
 

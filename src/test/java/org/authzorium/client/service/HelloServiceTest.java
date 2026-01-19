@@ -25,8 +25,10 @@ class HelloServiceTest extends BaseTest {
     @Test
     void helloReturnsExpectedMessage() {
         // Ensure repository contains the expected demo-user for this unit test
+        // Delete pets first to avoid referential integrity violations when deleting users
+        petRepository.deleteAll();
         userRepository.deleteAll();
-        userRepository.save(new UserEntity("demo-user", "Demo User Entity"));
+        userRepository.save(new UserEntity("demo-user", "Demo UserEntity"));
 
         HelloService svc = new HelloServiceImpl(userRepository, userMapper, petRepository, petMapper);
         assertEquals("Hello, Demo UserEntity!", svc.hello());
