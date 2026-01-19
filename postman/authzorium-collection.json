@@ -37,14 +37,34 @@
       }
     },
     {
-      "name": "Get All Pets of User",
+      "name": "Get All Pets of User (JPA pageable)",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/users/{{userId}}/pets",
+          "raw": "{{baseUrl}}/users/{{userName}}/pets?page=0&size=20",
           "host": ["{{baseUrl}}"],
-          "path": ["users", "{{userId}}", "pets"]
+          "path": ["users", "{{userName}}", "pets"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "20" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Pets of User (Blaze pageable)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userName}}/pets-blaze?page=0&size=20",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "{{userName}}", "pets-blaze"],
+          "query": [
+            { "key": "page", "value": "0" },
+            { "key": "size", "value": "20" }
+          ]
         }
       }
     }

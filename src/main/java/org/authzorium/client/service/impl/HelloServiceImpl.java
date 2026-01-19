@@ -13,6 +13,9 @@ import org.authzorium.client.repository.UserRepository;
 import org.authzorium.client.service.HelloService;
 import org.authzorium.client.util.LoggingConstants;
 import org.slf4j.MDC;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -77,12 +80,13 @@ public class HelloServiceImpl implements HelloService {
     }
 
     @Override
-    public List<Pet> getPetsOfUser(String userName) {
-        // Fetch all pets for the user in a single query (avoids N+1)
+    public Page<Pet> getPetsOfUser(String userName, Pageable pageable) {
         Long userId = userRepository.findByUsername(userName)
                 .map(UserEntity::getId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("User not found for username : {}", userName)));
-        List<PetEntity> pets = petRepository.findByOwnerId(userId);
-        return pets.stream().map(petMapper::toDto).toList();
+                .orElseThrow(() -> new IllegalArgumentException("User not found for username: " + userName));
+
+        Page<PetEntity> petEntities = petRepository.findByOwnerId(userId, pageable);
+        List<Pet> petDtos = petEntities.stream().map(petMapper::toDto).toList();
+        return new PageImpl<>(petDtos, pageable, petEntities.getTotalElements());
     }
 }
