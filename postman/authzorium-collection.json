@@ -1,0 +1,57 @@
+{
+  "info": {
+    "_postman_id": "authzorium-collection-20260119",
+    "name": "Authzorium API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for all Authzorium API endpoints."
+  },
+  "item": [
+    {
+      "name": "Find User by Username",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/findByUsername/{{userName}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "findByUsername", "{{userName}}"]
+        }
+      }
+    },
+    {
+      "name": "Create User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"sampleuser\",\n  \"displayName\": \"Sample User\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/users",
+          "host": ["{{baseUrl}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "Get All Pets of User",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/{{userId}}/pets",
+          "host": ["{{baseUrl}}"],
+          "path": ["users", "{{userId}}", "pets"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "userName", "value": "demo-user" },
+    { "key": "userId", "value": "1" }
+  ]
+}
